@@ -6,8 +6,16 @@ let
   wmii = pkgs.wmii_hg;
 in
 {
-  options = {
-    services.xserver.windowManager.wmii.enable = mkEnableOption "wmii";
+  options.services.xserver.windowManager.wmii = {
+    enable = mkEnableOption "wmii";
+    
+    extraSessionCommands = mkOption {
+      default     = "";
+      type        = types.lines;
+      description = ''
+        Shell commands executed just before wmii is started.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -28,6 +36,8 @@ in
       # subject "wmii and xrandr" on mailinglist)
       { name = "wmii";
         start = ''
+          ${cfg.extraSessionCommands}
+          
           while :; do
             ${wmii}/bin/wmii && break
           done
